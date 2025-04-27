@@ -1,0 +1,24 @@
+.magazine-list {
+    padding: 30px;
+}
+
+.magazine-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.magazine-card {
+    background-color: #FBCB91;
+    padding: 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #333;
+    width: 250px;
+}
+
+.magazine-card:hover {
+    background-color: #F28C28;
+    color: white;
+}

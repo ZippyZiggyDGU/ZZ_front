@@ -1,0 +1,38 @@
+.analysis-page {
+    padding: 30px;
+    text-align: center;
+}
+
+.graph-placeholder {
+    margin-top: 30px;
+    height: 250px;
+    background-color: #FBCB91;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    color: #666;
+    border-radius: 10px;
+}
+
+.health-tips {
+    margin-top: 40px;
+}
+
+.health-tips h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.health-tips ul {
+    list-style: none;
+    padding: 0;
+}
+
+.health-tips li {
+    background: #FBCB91;
+    margin: 10px auto;
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 400px;
+}

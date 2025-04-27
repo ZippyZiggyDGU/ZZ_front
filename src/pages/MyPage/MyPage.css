@@ -1,0 +1,31 @@
+.search-form button {
+    padding: 5px 15px;
+    background-color: #F28C28;
+    /* 버튼 기본색 */
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.search-form button:hover {
+    background-color: #FBCB91;
+    /* 버튼 hover 색 */
+}
+
+.record-list {
+    margin-top: 20px;
+}
+
+.record-item {
+    background-color: #FBCB91;
+    /* 기록 카드 배경색 */
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.no-data {
+    margin-top: 20px;
+    color: #999;
+}
