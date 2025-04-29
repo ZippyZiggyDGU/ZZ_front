@@ -40,3 +40,54 @@
 .read-the-docs {
   color: #888;
 }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #FFF8F0;
+  /* 기본 배경색 */
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  background-color: #F28C28;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #FBCB91;
+}
+
+input,
+select,
+textarea {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #F28C28;
+  outline: none;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+  padding: 0;
+}
+
+.page-container {
+  padding: 30px;
+}

@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./contexts/UserContext";
+import './styles/App.css';
+
 
 import Header from "./components/Header/Header";
 import LoginPage from "./pages/LoginPage/LoginPage";

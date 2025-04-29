@@ -12,7 +12,6 @@ function MainPage() {
     const [magazines, setMagazines] = useState([]);
     const navigate = useNavigate();
 
-
     const mockRanking = [
         { id: 1, name: "김○영" },
         { id: 2, name: "박○연" },
@@ -31,9 +30,8 @@ function MainPage() {
             bloodSugar: bloodSugarInput,
             smoker: isSmoker,
         });
-        navigate("/analysis");  // 분석 결과 페이지로 이동
+        navigate("/analysis");
     };
-
 
     const handleReset = () => {
         setPrsInput("");
@@ -42,79 +40,68 @@ function MainPage() {
     };
 
     return (
-        <div style={{ padding: "20px" }}>
-            <h1>심혈관 질환 위험도 분석</h1>
+        <div className="main-page">
+            <div className="top-section">
+                {/* 왼쪽 입력폼 */}
+                <div className="left-form">
+                    <h1>심혈관 질환 위험도 분석</h1>
 
-            <section style={{ marginBottom: "30px" }}>
-                <div>
-                    <label>PRS 점수</label><br />
-                    <input
-                        type="number"
-                        value={prsInput}
-                        onChange={(e) => setPrsInput(e.target.value)}
-                        placeholder="PRS 점수를 입력하세요"
-                    />
+                    <div>
+                        <label>PRS 점수</label><br />
+                        <input
+                            type="number"
+                            value={prsInput}
+                            onChange={(e) => setPrsInput(e.target.value)}
+                            placeholder="PRS 점수를 입력하세요"
+                        />
+                    </div>
+
+                    <div className="input-group">
+                        <label>혈당</label><br />
+                        <input
+                            type="number"
+                            value={bloodSugarInput}
+                            onChange={(e) => setBloodSugarInput(e.target.value)}
+                            placeholder="공복 혈당을 입력하세요"
+                        />
+                    </div>
+
+                    <div className="input-group">
+                        <label>흡연 여부</label><br />
+                        <button onClick={() => setIsSmoker(false)}>아니오</button>
+                        <button onClick={() => setIsSmoker(true)}>예</button>
+                    </div>
+
+                    <div className="button-group">
+                        <button onClick={handleReset}>초기화</button>
+                        <button onClick={handleAnalyze}>분석하기</button>
+                    </div>
                 </div>
 
-                <div style={{ marginTop: "15px" }}>
-                    <label>혈당</label><br />
-                    <input
-                        type="number"
-                        value={bloodSugarInput}
-                        onChange={(e) => setBloodSugarInput(e.target.value)}
-                        placeholder="공복 혈당을 입력하세요"
-                    />
-                </div>
-
-                <div style={{ marginTop: "15px" }}>
-                    <label>흡연 여부</label><br />
-                    <button
-                        onClick={() => setIsSmoker(false)}
-                        style={{ marginRight: "10px", backgroundColor: !isSmoker ? "#ccc" : "white" }}
-                    >
-                        아니오
-                    </button>
-                    <button
-                        onClick={() => setIsSmoker(true)}
-                        style={{ backgroundColor: isSmoker ? "#ccc" : "white" }}
-                    >
-                        예
-                    </button>
-                </div>
-
-                <div style={{ marginTop: "20px" }}>
-                    <button onClick={handleReset} style={{ marginRight: "10px" }}>초기화</button>
-                    <button onClick={handleAnalyze}>분석하기</button>
-                </div>
-            </section>
-            
-            <section style={{ marginTop: "40px" }}>
-                <h2>심부전 위험도 랭킹</h2>
-                <div style={{ marginTop: "10px" }}>
+                {/* 오른쪽 랭킹 */}
+                <div className="right-ranking">
+                    <h2>심부전 위험도 랭킹</h2>
                     {mockRanking.map((person, index) => (
-                        <div key={person.id} style={{ marginBottom: "8px" }}>
+                        <div key={person.id}>
                             {index + 1}위: {person.name}
                         </div>
                     ))}
                 </div>
-            </section>
+            </div>
 
-            <section>
+            {/* 아래쪽 매거진 */}
+            <div className="bottom-magazine">
                 <h2>건강 매거진</h2>
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
                     {magazines.map((magazine) => (
-                        <div
-                            key={magazine.id}
-                            style={{ border: "1px solid #ccc", padding: "10px", borderRadius: "8px" }}
-                        >
+                        <div key={magazine.id} style={{ width: "250px", border: "1px solid #ccc", padding: "15px", borderRadius: "10px" }}>
                             <h3>{magazine.title}</h3>
                             <p>{magazine.description}</p>
                         </div>
                     ))}
                 </div>
-            </section>
+            </div>
         </div>
     );
 }
-
-export default MainPage;
+export default MainPage; 
