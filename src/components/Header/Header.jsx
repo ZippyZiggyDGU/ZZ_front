@@ -9,7 +9,9 @@ function Header() {
     return (
         <header className="header">
             <div className="logo-area">
-                <img src="/logo.png" alt="logo" className="logo" />
+                <Link to="/" className="logo-link">
+                    <img src="/logo.png" alt="logo" className="logo" />
+                </Link>
                 <span className="site-name">지피지기</span>
             </div>
 

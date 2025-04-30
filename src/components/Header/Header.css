@@ -2,35 +2,59 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #f9f9f9;
-    padding: 10px 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #FFF8F0;
+    padding: 4px 24px;
+    /* 위아래 4px, 좌우 24px */
+    height: 48px;
+    /* 얇은 헤더 */
+    border-bottom: 1px solid #E0C3A0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .logo-area {
     display: flex;
     align-items: center;
+    gap: 8px;
+    /* 너무 넓으면 4px 또는 제거 가능 */
+    margin-left: 0;
 }
 
 .logo {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
+    width: 32px;
+    height: 32px;
 }
-
-.site-name {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
+.logo {
+    width: 32px;
+    height: 32px;
+}
+.nav {
+    display: flex;
+    align-items: center;
 }
 
 .nav a {
-    margin-left: 20px;
+    margin-left: 24px;
     text-decoration: none;
-    color: #666;
+    color: #333;
     font-size: 16px;
+    transition: color 0.2s ease;
 }
 
 .nav a:hover {
-    color: #333;
+    color: #F28C28;
+    /* 강조색으로 hover 효과 */
+}
+
+.site-name {
+    font-size: 20px;
+    /* 크기 줄임 */
+    color: #000000;
+    /* 검정색 */
+    margin: 0;
+    /* 좌우 여백 제거 */
+    padding-left: 0;
+    /* 왼쪽 딱 붙도록 */
 }

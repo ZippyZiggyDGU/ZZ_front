@@ -1,3 +1,4 @@
+
 import { useContext, useState, useEffect } from "react";
 import { UserContext } from "../../contexts/UserContext";
 import { mockHealthMagazines } from "../../api/mockData";
@@ -42,59 +43,87 @@ function MainPage() {
     return (
         <div className="main-page">
             <div className="top-section">
-                {/* 왼쪽 입력폼 */}
                 <div className="left-form">
-                    <h1>심혈관 질환 위험도 분석</h1>
+                    <h1 className="main-title">심혈관 질환 위험도 분석</h1>
+                    <p className="main-subtitle">
+                        분석을 위해 본인의 PRS 점수와 개인 건강 정보를 입력해주세요
+                    </p>
 
-                    <div>
-                        <label>PRS 점수</label><br />
+                    <div className="input-group">
                         <input
                             type="number"
                             value={prsInput}
                             onChange={(e) => setPrsInput(e.target.value)}
-                            placeholder="PRS 점수를 입력하세요"
+                            placeholder="PRS 점수를 입력하세요."
                         />
                     </div>
 
                     <div className="input-group">
-                        <label>혈당</label><br />
                         <input
                             type="number"
                             value={bloodSugarInput}
                             onChange={(e) => setBloodSugarInput(e.target.value)}
-                            placeholder="공복 혈당을 입력하세요"
+                            placeholder="공복 혈당을 입력하세요."
                         />
                     </div>
 
                     <div className="input-group">
-                        <label>흡연 여부</label><br />
-                        <button onClick={() => setIsSmoker(false)}>아니오</button>
-                        <button onClick={() => setIsSmoker(true)}>예</button>
+                        <span className="input-label">흡연 여부</span>
+                        <div className="smoke-button-group">
+                            <button
+                                className={`smoke-button ${!isSmoker ? "selected" : ""}`}
+                                onClick={() => setIsSmoker(false)}
+                            >
+                                아니오
+                            </button>
+                            <button
+                                className={`smoke-button ${isSmoker ? "selected" : ""}`}
+                                onClick={() => setIsSmoker(true)}
+                            >
+                                예
+                            </button>
+                        </div>
                     </div>
 
                     <div className="button-group">
-                        <button onClick={handleReset}>초기화</button>
-                        <button onClick={handleAnalyze}>분석하기</button>
+                        <button className="button-reset" onClick={handleReset}>초기화</button>
+                        <button className="button-analyze" onClick={handleAnalyze}>분석하기</button>
                     </div>
                 </div>
 
-                {/* 오른쪽 랭킹 */}
                 <div className="right-ranking">
-                    <h2>심부전 위험도 랭킹</h2>
-                    {mockRanking.map((person, index) => (
-                        <div key={person.id}>
-                            {index + 1}위: {person.name}
-                        </div>
-                    ))}
+                    <h2 className="ranking-title">
+                        심부전 위험도 랭킹
+                        <button className="refresh-button" onClick={() => alert('데이터 새로고침 예정')}>
+                            🔄
+                        </button>
+                    </h2>
+
+                    <p className="ranking-desc">여성 / 또래 (만 50세 ~ 59세)</p>
+                    <div className="ranking-list">
+                        {mockRanking.map((person, index) => (
+                            <div key={person.id} className="ranking-item">
+                                {index < 3 ? (
+                                    <span className="medal">{['🥇', '🥈', '🥉'][index]}</span>
+                                ) : (
+                                    <span className="rank-circle">{index + 1}</span>
+                                )}
+
+                                <span className="rank-name">{person.name}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
-            {/* 아래쪽 매거진 */}
             <div className="bottom-magazine">
-                <h2>건강 매거진</h2>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+                <h2 className="magazine-title">건강 매거진</h2>
+                <p className="magazine-subtext">
+                    심혈관 건강 관리를 위해 매거진을 탐색해보세요
+                </p>
+                <div className="magazine-grid">
                     {magazines.map((magazine) => (
-                        <div key={magazine.id} style={{ width: "250px", border: "1px solid #ccc", padding: "15px", borderRadius: "10px" }}>
+                        <div key={magazine.id} className="magazine-card">
                             <h3>{magazine.title}</h3>
                             <p>{magazine.description}</p>
                         </div>
@@ -104,4 +133,5 @@ function MainPage() {
         </div>
     );
 }
-export default MainPage; 
+
+export default MainPage;
