@@ -79,7 +79,7 @@ input[type="password"]:not(:first-of-type) {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 0px;
+    margin-top: 20px;
     gap: 60px;
     padding: 0 40px;
     flex: 1;

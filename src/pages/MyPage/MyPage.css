@@ -1,31 +1,131 @@
-.search-form button {
-    padding: 5px 15px;
+.mypage-container {
+    background-color: #FFF8F0;
+    min-height: 100vh;
+    padding: 0;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.mypage-header {
+    background-color: #FBCB91;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px 60px;
+}
+
+.greeting h2 {
+    font-size: 28px;
+    margin: 0;
+}
+
+.greeting p {
+    font-size: 18px;
+    margin-top: 4px;
+}
+
+.edit-button {
     background-color: #F28C28;
-    /* 버튼 기본색 */
-    border: none;
     color: white;
-    border-radius: 5px;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: bold;
     cursor: pointer;
 }
 
-.search-form button:hover {
-    background-color: #FBCB91;
-    /* 버튼 hover 색 */
+.edit-button:hover {
+    background-color: #f8b36d;
 }
 
-.record-list {
-    margin-top: 20px;
+.record-section {
+    max-width: 1200px;
+    /* 넓은 공간 확보 */
+    padding: 40px 60px;
+    margin: 0 auto;
+    text-align: center;
 }
-
-.record-item {
-    background-color: #FBCB91;
-    /* 기록 카드 배경색 */
-    padding: 10px;
+.record-title {
+    font-size: 30px;
+    font-weight: bold;
     margin-bottom: 10px;
-    border-radius: 5px;
 }
 
-.no-data {
-    margin-top: 20px;
-    color: #999;
+.record-sub {
+    font-size: 20px;
+    color: #444;
+    margin-bottom: 30px;
+}
+
+.date-filter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.date-filter input[type="date"] {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.search-button {
+    background-color: #F28C28;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #f8b36d;
+}
+
+.record-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* 한 줄에 두 개 */
+    gap: 30px;
+    margin-bottom: 40px;
+    justify-items: center;
+}
+
+.record-card {
+    width: 100%;
+    max-width: 460px;
+    background-color: #FFF8F0;
+    padding: 24px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* 왼쪽 정렬 */
+}
+
+.record-card .score {
+    font-size: 25px;
+    /* 점수 크게 */
+    font-weight: bold;
+    margin: 8px 0;
+}
+
+.record-card .date,
+.record-card .change {
+    font-size: 16px;
+    color: #333;
+}
+
+
+.graph-container {
+    background-color: #FFF8F0;
+    /* 배경 통일 */
+    padding: 20px;
+    border-radius: 12px;
 }
