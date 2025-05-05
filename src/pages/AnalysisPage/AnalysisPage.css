@@ -1,34 +1,63 @@
 .analysis-page {
     background-color: #FFF8F0;
     min-height: 100vh;
-    padding: 60px;
+    padding: 60px 20px;
     font-family: 'Noto Sans KR', sans-serif;
     box-sizing: border-box;
     text-align: center;
 }
 
 .analysis-page h1 {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: bold;
     margin-bottom: 24px;
+    color: #333;
 }
 
 .analysis-page .highlight {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: bold;
-    color: #333;
-    margin-bottom: 12px;
+    color: #F28C28;
+    margin-bottom: 16px;
 }
 
 .recommendation {
-    font-size: 16px;
-    color: #555;
+    font-size: 18px;
+    color: #444;
     margin-bottom: 40px;
 }
 
 .chart-wrapper {
     background-color: #FFF8F0;
-    padding: 0 20px;
+    padding: 20px 0;
     max-width: 800px;
+    margin: 0 auto 40px auto;
+}
+
+.tips-section {
+    max-width: 600px;
     margin: 0 auto;
+    padding: 20px 30px;
+    background-color: #FBCB91;
+    border-radius: 10px;
+    text-align: left;
+}
+
+.tips-section h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    color: #333;
+}
+
+.tip-item {
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tip-item span.emoji {
+    font-size: 20px;
 }

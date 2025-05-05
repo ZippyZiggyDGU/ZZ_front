@@ -6,11 +6,12 @@ import { useNavigate } from "react-router-dom";
 import "./MainPage.css";
 
 function MainPage() {
-    const { updateUserInfo } = useContext(UserContext);
+    const { updateUserInfo, updatePrsScore } = useContext(UserContext);
     const [prsInput, setPrsInput] = useState("");
     const [bloodSugarInput, setBloodSugarInput] = useState("");
     const [isSmoker, setIsSmoker] = useState(false);
     const [magazines, setMagazines] = useState([]);
+    
     const navigate = useNavigate();
 
     const mockRanking = [
@@ -27,10 +28,10 @@ function MainPage() {
 
     const handleAnalyze = () => {
         updateUserInfo({
-            prsScore: prsInput,
             bloodSugar: bloodSugarInput,
             smoker: isSmoker,
         });
+        updatePrsScore(Number(prsInput))
         navigate("/analysis");
     };
 
@@ -116,7 +117,7 @@ function MainPage() {
                 </div>
             </div>
 
-            <div className="bottom-magazine">
+            <div className="bottom-magazine">a
                 <h2 className="magazine-title">건강 매거진</h2>
                 <p className="magazine-subtext">
                     심혈관 건강 관리를 위해 매거진을 탐색해보세요
