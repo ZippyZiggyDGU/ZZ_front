@@ -1,8 +1,9 @@
 
 import { useContext, useState, useEffect } from "react";
 import { UserContext } from "../../contexts/UserContext";
-import { mockHealthMagazines } from "../../api/mockData";
-import { useNavigate } from "react-router-dom";
+import { magazineData } from "../../api/magazineData";
+import { useNavigate, Link } from "react-router-dom";
+
 import "./MainPage.css";
 
 function MainPage() {
@@ -10,7 +11,6 @@ function MainPage() {
     const [prsInput, setPrsInput] = useState("");
     const [bloodSugarInput, setBloodSugarInput] = useState("");
     const [isSmoker, setIsSmoker] = useState(false);
-    const [magazines, setMagazines] = useState([]);
     
     const navigate = useNavigate();
 
@@ -21,10 +21,6 @@ function MainPage() {
         { id: 4, name: "송○은 (나)" },
         { id: 5, name: "이○민" },
     ];
-
-    useEffect(() => {
-        setMagazines(mockHealthMagazines);
-    }, []);
 
     const handleAnalyze = () => {
         updateUserInfo({
@@ -117,17 +113,19 @@ function MainPage() {
                 </div>
             </div>
 
-            <div className="bottom-magazine">a
+            <div className="bottom-magazine">
                 <h2 className="magazine-title">건강 매거진</h2>
                 <p className="magazine-subtext">
                     심혈관 건강 관리를 위해 매거진을 탐색해보세요
                 </p>
-                <div className="magazine-grid">
-                    {magazines.map((magazine) => (
-                        <div key={magazine.id} className="magazine-card">
-                            <h3>{magazine.title}</h3>
-                            <p>{magazine.description}</p>
-                        </div>
+                <div className="magazine-cards">
+                    {magazineData.map((item) => (
+                        <Link to={`/magazine/${item.id}`} key={item.id} className="magazine-card">
+                            <div className="magazine-text">
+                                <h2>{item.title}</h2>
+                                <p>{item.subtitle}</p>
+                            </div>
+                        </Link>
                     ))}
                 </div>
             </div>

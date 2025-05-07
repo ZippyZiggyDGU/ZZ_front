@@ -9,9 +9,12 @@ function MagazineListPage() {
             <div className="magazine-cards">
                 {magazineData.map((item) => (
                     <Link to={`/magazine/${item.id}`} key={item.id} className="magazine-card">
-                        <h2>{item.title}</h2>
-                        <p>{item.subtitle}</p>
+                        <div className="magazine-text">
+                            <h2>{item.title}</h2>
+                            <p>{item.subtitle}</p>
+                        </div>
                     </Link>
+
                 ))}
             </div>
         </div>

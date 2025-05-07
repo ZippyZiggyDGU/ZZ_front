@@ -183,36 +183,66 @@ input::placeholder {
 .magazine-title {
     font-size: 26px;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 14px;
+    /* 👈 기존보다 여유 있게 */
 }
 
 .magazine-subtext {
     font-size: 16px;
     color: #666;
-    margin-bottom: 28px;
+    margin-bottom: 30px;
+    /* 👈 카드와의 간격 더 주기 */
 }
 
-.magazine-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 28px;
+.magazine-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 36px;
+    /* 👈 카드끼리 간격 넉넉히 */
 }
 
 .magazine-card {
-    width: 260px;
-    background-color: #FBCB91;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    background-color: #FFF8F0;
+    padding: 30px;
     border-radius: 12px;
-    padding: 22px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 0 1px #e0e0e0;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.4s ease, box-shadow 0.4s ease, background-color 0.4s ease;
+    width: 90%;
+    /* 약간 너비 축소 */
+    cursor: pointer;
 }
 
-.magazine-card h3 {
-    font-size: 18px;
+.magazine-card:hover {
+    transform: scale(1.08);
+    /* hover 시 확대 효과 더 큼 */
+    background-color: #ffe2bb;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.magazine-card::before {
+    content: "";
+    width: 70px;
+    height: 70px;
+    background-color: #ddd;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.magazine-text h2 {
+    font-size: 20px;
+    margin: 0 0 8px 0;
     font-weight: bold;
-    margin-bottom: 10px;
+    line-height: 1.4;
 }
 
-.magazine-card p {
-    font-size: 16px;
-    color: #333;
+.magazine-text p {
+    margin: 0;
+    font-size: 15px;
+    color: #555;
+    line-height: 1.4;
 }
