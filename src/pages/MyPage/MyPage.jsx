@@ -44,12 +44,12 @@ function MyPage() {
                     <h2>송지은 님</h2>
                     <p>안녕하세요 오늘도 건강한 하루 되세요</p>
                 </div>
-                <button className="edit-button" onClick={openModal}>프로필 수정</button>
+                <button className="edit-button" onClick={openModal}>비밀번호 변경</button>
             </div>
 
             {/* 기록 섹션 */}
             <div className="record-section">
-                <h2 className="record-title">심혈관 질병 위험도 기록</h2>
+                <h2 className="record-title">심방세동 발병 확률 기록</h2>
                 <p className="record-sub">당신의 진행상황을 추적하세요</p>
 
                 <div className="date-filter">

@@ -246,3 +246,37 @@ input::placeholder {
     color: #555;
     line-height: 1.4;
 }
+/* src/pages/MainPage.css 에 추가 */
+
+.ai-button {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+
+    /* 1) 크기 2배 (원래 80px → 160px) */
+    width: 160px;
+    height: 160px;
+
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    /* 2) 호버 애니메이션 준비 */
+    transition: transform 0.2s ease;
+}
+.ai-button:hover {
+    /* 3) 호버 시 원본 배경 변화 삭제하고, 크기만 살짝 키우기 */
+    transform: scale(1.05);
+    background: none !important;
+    background-color: transparent !important;
+}
+
+.ai-icon {
+    display: block;
+    width: 100%;
+    /* 버튼 영역 꽉 채우기 */
+    height: 100%;
+    object-fit: contain;
+    /* 비율 그대로 보여주기 */
+}

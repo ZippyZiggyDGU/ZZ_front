@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { login } from "../../api/auth.js";
+import { UserContext } from "../../contexts/UserContext";
 import "./LoginPage.css";
 
 function LoginPage() {
@@ -7,11 +9,40 @@ function LoginPage() {
     const [password, setPassword] = useState("");
     const [autoLogin, setAutoLogin] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const { loginUser } = useContext(UserContext);
     const navigate = useNavigate();
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        navigate("/");
+        if (!email || !password) {
+            alert("이메일과 비밀번호를 모두 입력해주세요.");
+            return;
+        }
+        setLoading(true);
+        try {
+            const response = await login({
+                userId: email,
+                password,
+                rememberMe: autoLogin
+            });
+            const { accessToken, refreshToken } = response.data;
+            loginUser(accessToken);
+            // 토큰 저장 (localStorage 또는 context에 저장)
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
+            alert("로그인 성공!");
+            navigate("/");
+        } catch (err) {
+            console.error(err);
+            if (err.response) {
+                alert(`로그인 실패: ${err.response.data.message || err.response.statusText}`);
+            } else {
+                alert("로그인 중 오류가 발생했습니다.");
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -26,6 +57,7 @@ function LoginPage() {
                     placeholder="이메일을 입력하세요."
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    required
                 />
 
                 <label htmlFor="password">비밀번호</label>
@@ -36,11 +68,13 @@ function LoginPage() {
                         placeholder="비밀번호를 입력하세요."
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        required
                     />
                     <button
                         type="button"
                         className="toggle-password"
                         onClick={() => setShowPassword(!showPassword)}
+                        tabIndex={-1}
                     >
                         {showPassword ? "🙈" : "👁️"}
                     </button>
@@ -61,8 +95,8 @@ function LoginPage() {
                     </Link>
                 </div>
 
-                <button type="submit" className="login-btn">
-                    로그인
+                <button type="submit" className="login-btn" disabled={loading}>
+                    {loading ? "로그인 중…" : "로그인"}
                 </button>
             </form>
         </div>
