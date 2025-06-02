@@ -32,7 +32,8 @@ function MagazineListPage() {
                     <Link to={`/magazine/${item.id}`} key={item.id} className="magazine-card">
                         <div className="magazine-text">
                             <h2>{item.title}</h2>
-                            <p>{item.content}</p>
+                            {/* 내용 1줄만 보여주기 */}
+                            <p>{item.content.split("\n")[0]}</p>
                         </div>
                     </Link>
                 ))}

@@ -1,8 +1,10 @@
+/* src/pages/AnalysisPage.css */
+
 .analysis-page {
-    background-color: #FFF8F0;
+    background-color: #fff8f0;
     min-height: 100vh;
     padding: 60px 20px;
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: "Noto Sans KR", sans-serif;
     box-sizing: border-box;
     text-align: center;
 }
@@ -17,8 +19,12 @@
 .analysis-page .highlight {
     font-size: 22px;
     font-weight: bold;
-    color: #F28C28;
+    color: #f28c28;
     margin-bottom: 16px;
+}
+
+.analysis-page .highlight span {
+    color: #333;
 }
 
 .recommendation {
@@ -27,37 +33,118 @@
     margin-bottom: 40px;
 }
 
-.chart-wrapper {
-    background-color: #FFF8F0;
-    padding: 20px 0;
-    max-width: 800px;
-    margin: 0 auto 40px auto;
-}
-
-.tips-section {
+/* 랭킹 섹션 */
+.ranking-section {
     max-width: 600px;
-    margin: 0 auto;
-    padding: 20px 30px;
-    background-color: #FBCB91;
-    border-radius: 10px;
-    text-align: left;
+    margin: 0 auto 50px auto;
+    padding: 20px;
+    background-color: #fff8f0;
 }
 
-.tips-section h3 {
+.ranking-section h3 {
     font-size: 20px;
     font-weight: bold;
-    margin-bottom: 16px;
     color: #333;
+    position: relative;
+    margin-bottom: 16px;
 }
 
-.tip-item {
-    font-size: 16px;
-    margin-bottom: 10px;
+.ranking-section .refresh-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ranking-item {
     display: flex;
     align-items: center;
     gap: 10px;
+    font-size: 16px;
 }
 
-.tip-item span.emoji {
+.medal {
     font-size: 20px;
+}
+
+.rank-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #ddd;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 28px;
+    color: #333;
+}
+
+.rank-name {
+    font-size: 16px;
+}
+
+/* 매거진 추천 섹션 */
+.recommendation-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    background-color: #fff8f0;
+    text-align: left;
+}
+
+.recommendation-section h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.recommendation-section .magazine-cards {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.recommendation-section .magazine-card {
+    background-color: #fff8f0;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px #e0e0e0;
+    text-decoration: none;
+    color: inherit;
+    width: calc(50% - 12px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.recommendation-section .magazine-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.recommendation-section .magazine-text h4 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.recommendation-section .magazine-text p {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #555;
+}
+
+/* 에러 메시지 */
+.error {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
 }
