@@ -1,4 +1,6 @@
-/* 검은 반투명 배경 전체 덮기 */
+/* src/components/ChatBot/ChatBot.css */
+
+/* 1. 검은 반투명 배경 전체 덮기 */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -12,7 +14,7 @@
     z-index: 1000;
 }
 
-/* 실제 모달 박스 */
+/* 2. 실제 모달 박스 */
 .modal-content {
     position: relative;
     width: 360px;
@@ -26,7 +28,7 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* 닫기 버튼 */
+/* 3. 닫기 버튼 */
 .close-btn {
     position: absolute;
     top: 8px;
@@ -35,12 +37,51 @@
     border: none;
     font-size: 20px;
     cursor: pointer;
+    z-index: 10;
 }
 
-/* 메시지 출력 영역 */
+/* 4. 의도 버튼 영역 */
+.intent-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+    background-color: #fafafa;
+    border-bottom: 1px solid #ddd;
+    justify-content: center;
+}
+
+.intent-button {
+    flex: 1 1 45%;
+    color: #333;
+    /* 두 줄로 배치될 때 45%씩 차지 */
+    max-width: 48%;
+    min-width: 100px;
+    background-color: #fff8f0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* 버튼 hover 시 약간 어두워지도록 */
+.intent-button:hover {
+    background-color: #ffeeda;
+}
+
+/* 선택된 버튼 스타일 */
+.intent-button.selected {
+    background-color: #f28c28;
+    color: white;
+    border: none;
+}
+
+/* 5. 메시지 출력 영역 */
 .chat-container {
     flex: 1;
-    padding: 16px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -54,12 +95,13 @@
     padding: 10px 14px;
     border-radius: 12px;
     line-height: 1.4;
+    word-break: keep-all;
 }
 
 /* 봇 메시지 - 왼쪽 정렬, 연한 배경 */
 .chat-message.bot {
     align-self: flex-start;
-    background: #FFF8F0;
+    background: #fff8f0;
     color: #333;
 }
 
@@ -70,7 +112,7 @@
     color: #333;
 }
 
-/* 입력 영역 */
+/* 6. 입력 영역 */
 .chat-input-area {
     display: flex;
     padding: 12px;
@@ -93,9 +135,27 @@
     margin-left: 8px;
     width: 44px;
     border: none;
-    background: #F28C28;
+    background: #f28c28;
     color: #fff;
     border-radius: 8px;
     font-size: 18px;
     cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.send-btn:hover {
+    background-color: #fbcb91;
+}
+
+/* 로딩 / 에러 텍스트(필요시 사용) */
+.loading {
+    padding: 16px;
+    text-align: center;
+    color: #666;
+}
+
+.error {
+    padding: 16px;
+    text-align: center;
+    color: red;
 }
