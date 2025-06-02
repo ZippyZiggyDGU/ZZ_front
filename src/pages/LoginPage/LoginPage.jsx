@@ -1,6 +1,7 @@
+// src/pages/LoginPage/LoginPage.jsx
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login } from "../../api/auth.js";
+import api, { login } from "../../api/auth.js";     // ← api 인스턴스도 같이 import
 import { UserContext } from "../../contexts/UserContext";
 import "./LoginPage.css";
 
@@ -24,19 +25,30 @@ function LoginPage() {
             const response = await login({
                 userId: email,
                 password,
-                rememberMe: autoLogin
+                rememberMe: autoLogin,
             });
+
             const { accessToken, refreshToken } = response.data;
+
+            // 1) Context 상태 업데이트
             loginUser(accessToken);
-            // 토큰 저장 (localStorage 또는 context에 저장)
+
+            // 2) 로컬 스토리지에 토큰 보관(원한다면)
             localStorage.setItem("accessToken", accessToken);
             localStorage.setItem("refreshToken", refreshToken);
+
+            // 3) **API 인스턴스의 기본 헤더에 토큰을 붙여주자**
+            //    이후 모든 api 호출 시 자동으로 Authorization 헤더가 추가됩니다.
+            api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+
             alert("로그인 성공!");
             navigate("/");
         } catch (err) {
             console.error(err);
             if (err.response) {
-                alert(`로그인 실패: ${err.response.data.message || err.response.statusText}`);
+                alert(
+                    `로그인 실패: ${err.response.data.message || err.response.statusText}`
+                );
             } else {
                 alert("로그인 중 오류가 발생했습니다.");
             }

@@ -1,18 +1,14 @@
 // src/pages/AnalysisPage.jsx
-
 import { useContext, useState, useEffect } from "react";
 import { UserContext } from "../../contexts/UserContext";
-import { getMagazines } from "../../api/magazine.js"; // 매거진 API 호출 함수
-import {
-    // import { LineChart, … } from "recharts"; // 그래프는 제거하므로 import하지 않음
-} from "recharts";
+import { getMagazines } from "../../api/magazine.js";
 import { Link } from "react-router-dom";
 
 import "./AnalysisPage.css";
 
 function AnalysisPage() {
-    // UserContext에서 prsScore(점수)와 userInfo를 가져옵니다.
-    const { prsScore, userInfo } = useContext(UserContext);
+    const { prsScore, userInfo, predictionResult } = useContext(UserContext);
+    const { label, probabilities } = predictionResult;
 
     // ------ 1. 랭킹 더미 데이터 (메인 페이지와 동일) ------
     const mockRanking = [
@@ -29,7 +25,6 @@ function AnalysisPage() {
     const [errorMag, setErrorMag] = useState(null);
 
     useEffect(() => {
-        // 예시: 전체 매거진을 가져온 뒤, 간단히 앞쪽 일부만 뿌리겠습니다.
         getMagazines()
             .then((res) => {
                 setMagazines(res.data);
@@ -42,56 +37,50 @@ function AnalysisPage() {
             });
     }, []);
 
-    // ------ 3. 분석 결과 문구 (percentile, recommendation) ------
-    // 그래프 부분을 제거했기 때문에, percentile 계산만 남겨 두겠습니다.
-    function erf(x) {
-        const sign = x >= 0 ? 1 : -1;
-        const a1 = 0.254829592,
-            a2 = -0.284496736,
-            a3 = 1.421413741;
-        const a4 = -1.453152027,
-            a5 = 1.061405429;
-        const p = 0.3275911;
-        const t = 1 / (1 + p * Math.abs(x));
-        const y =
-            1 -
-            (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t) *
-            Math.exp(-x * x);
-        return sign * y;
+    // ------ 3. 예측 결과가 Context에 있는지 확인 ------
+    //     없다면 “분석 결과가 없습니다” 문구를 보여줍니다.
+    if (label === null || probabilities.length === 0) {
+        return (
+            <div className="analysis-page">
+                <h1>분석된 결과가 없습니다.</h1>
+                <p>메인 페이지에서 “분석하기”를 먼저 눌러주세요.</p>
+            </div>
+        );
     }
-    function calculatePercentile(score, mean = 75, std = 5) {
-        const z = (score - mean) / std;
-        return Math.round(100 * 0.5 * (1 + erf(z / Math.sqrt(2))));
-    }
-    const percentile = calculatePercentile(prsScore);
 
+    // 예시: probabilities 배열이 [p0, p1] 형태라고 가정했을 때,
+    // AF(심방세동) 발병 확률을 probabilities[1]로 간주합니다.
+    // 실제 배열 크기와 뜻은 백엔드 스펙에 맞춰 조정하세요.
+    const afProbability = probabilities[1] ?? 0;
+
+    // 추천 문구: 확률이 0.5 이상이면 “위험”, 아니면 “양호” 예시
     let recommendation = "";
-    if (percentile >= 75) {
-        recommendation = "위험도가 높습니다. 즉시 생활 습관을 바꾸세요!";
-    } else if (percentile >= 50) {
-        recommendation = "주의가 필요합니다. 규칙적인 운동과 식단이 중요합니다.";
-    } else if (percentile >= 25) {
-        recommendation = "건강한 편입니다. 가벼운 운동과 식단 관리를 시작해보세요.";
+    if (afProbability >= 0.75) {
+        recommendation = "매우 높은 위험도입니다. 즉시 의료기관 상담을 권장합니다.";
+    } else if (afProbability >= 0.5) {
+        recommendation = "위험도가 높습니다. 생활 습관 개선을 권장합니다.";
+    } else if (afProbability >= 0.25) {
+        recommendation = "조금 주의가 필요합니다. 규칙적인 운동과 식단관리가 중요합니다.";
     } else {
-        recommendation = "매우 건강합니다! 좋은 습관을 유지하세요.";
+        recommendation = "비교적 낮은 위험도입니다. 좋은 습관을 계속 유지하세요!";
     }
 
     return (
         <div className="analysis-page">
-            {/* 1. 페이지 상단: 분석 결과 */}
+            {/* 1. 페이지 상단: 예측 결과 */}
             <h1>심방세동 분석 결과</h1>
             <h2 className="highlight">
-                당신의 심방세동 발병 확률은 <span>{percentile}%</span>입니다.
+                당신의 심방세동 발병 확률은 <span>{(afProbability * 100).toFixed(1)}%</span>입니다.
             </h2>
             <p className="recommendation">{recommendation}</p>
 
-            {/* 2. 랭킹 섹션 (메인 페이지와 동일한 UI) */}
+            {/* 2. 랭킹 섹션 (메인 페이지와 동일 UI) */}
             <div className="ranking-section">
                 <h3>
                     심방세동 발병 확률 랭킹
                     <button
                         className="refresh-button"
-                        onClick={() => alert("데이터 새로고침 예정")}
+                        onClick={() => alert("랭킹 데이터 새로고침 예정")}
                     >
                         🔄
                     </button>
@@ -113,8 +102,9 @@ function AnalysisPage() {
             {/* 3. 사용자 정보 기반 매거진 추천 섹션 */}
             <div className="recommendation-section">
                 <h3>
-                    {userInfo.age}세 {userInfo.gender === "female" ? "여성" : "남성"}{" "}
-                    {userInfo.smoker ? "흡연자" : "비흡연자"}인 당신을 위한 맞춤형 매거진
+                    {userInfo.age}세{" "}
+                    {userInfo.gender === "female" ? "여성" : "남성"} {userInfo.smoker ? "흡연자" : "비흡연자"}인
+                    당신을 위한 맞춤형 매거진 추천
                 </h3>
 
                 {loadingMag ? (
@@ -123,16 +113,11 @@ function AnalysisPage() {
                     <p className="error">{errorMag}</p>
                 ) : (
                     <div className="magazine-cards">
-                        {/* 예시: 앞에서 두 개만 보여주기 */}
                         {magazines.slice(0, 2).map((item) => (
-                            <Link
-                                to={`/magazine/${item.id}`}
-                                key={item.id}
-                                className="magazine-card"
-                            >
+                            <Link to={`/magazine/${item.id}`} key={item.id} className="magazine-card">
                                 <div className="magazine-text">
                                     <h4>{item.title}</h4>
-                                    {/* 본문을 줄바꿈(\n) 기준으로 첫 줄만 출력 */}
+                                    {/* 본문을 줄바꿈(\n) 기준으로 첫 줄만 보여줍니다. */}
                                     <p>{item.content.split("\n")[0]}</p>
                                 </div>
                             </Link>
@@ -140,8 +125,6 @@ function AnalysisPage() {
                     </div>
                 )}
             </div>
-
-            {/* 4. (원한다면) 아래에 더 많은 매거진 추천 문구를 추가하거나, Tailored UI를 넣어도 됩니다. */}
         </div>
     );
 }
