@@ -2,7 +2,8 @@
 import { useContext, useState, useEffect } from "react";
 import { UserContext } from "../../contexts/UserContext";
 import { getMagazines } from "../../api/magazine.js";
-import { predictAtrialFibrillation } from "../../api/auth"; // 예측 API 함수 임포트
+import { predictAtrialFibrillation } from "../../api/auth";
+import { getRank } from "../../api/rank.js"; // 랭킹 API 헬퍼 함수
 import { useNavigate, Link } from "react-router-dom";
 import ChatBot from "../../components/ChatBot/ChatBot";
 import AiIcon from "../../assets/ai-icon.png";
@@ -14,6 +15,7 @@ function MainPage() {
         updatePrsScore,
         updatePredictionResult,
         userInfo,
+        isLoggedIn,      // 로그인 상태 여부
     } = useContext(UserContext);
 
     const [prsInput, setPrsInput] = useState("");
@@ -22,29 +24,64 @@ function MainPage() {
     const [isSmoker, setIsSmoker] = useState(false);
     const [showBot, setShowBot] = useState(false);
 
-    const [isLoading, setIsLoading] = useState(false); // 예측 API 호출 중 로딩 상태
-
+    const [isLoading, setIsLoading] = useState(false); // 예측 API 호출 시 로딩 상태
     const navigate = useNavigate();
 
+    // ───────────────────────────────────────────────────────────────────────────────
+    // 0) 랭킹 API 호출 관련 상태
+    // ───────────────────────────────────────────────────────────────────────────────
+    const [rankList, setRankList] = useState([]);    // [{ rank, userName }, …]  길이는 항상 5
+    const [loadingRank, setLoadingRank] = useState(true);
+    const [errorRank, setErrorRank] = useState(null);
+
+    // ───────────────────────────────────────────────────────────────────────────────
+    // 1) 컴포넌트 마운트 시: 로그인 상태에 따라 /rank API 호출 또는 메시지 표시
+    // ───────────────────────────────────────────────────────────────────────────────
+    useEffect(() => {
+        if (!isLoggedIn) {
+            // 로그인 안 되었으면 랭킹 API 호출을 건너뛰고, 안내 문구만 띄움
+            setErrorRank("랭킹을 확인하려면 로그인을 해야합니다.");
+            setLoadingRank(false);
+            return;
+        }
+
+        // 로그인된 상태라면 실제 /rank API 호출
+        setLoadingRank(true);
+        getRank()
+            .then((res) => {
+                // res.data가 5개 항목(1~3위, 나, 꼴등)이라고 가정
+                setRankList(res.data || []);
+                setErrorRank(null);
+                setLoadingRank(false);
+            })
+            .catch((err) => {
+                console.error("랭킹 API 호출 중 오류:", err);
+                setErrorRank("랭킹 정보를 불러오는 중 오류가 발생했습니다.");
+                setLoadingRank(false);
+            });
+    }, [isLoggedIn]);
+
+    // ───────────────────────────────────────────────────────────────────────────────
+    // 2) 사용자 이름 가운데를 "*"로 가려주는 헬퍼 (길이가 2 이하면 그대로 반환)
+    // ───────────────────────────────────────────────────────────────────────────────
+    const obscureName = (name) => {
+        if (!name) return "";
+        if (name.length <= 2) return name;
+        const middle = "*".repeat(name.length - 2);
+        return name[0] + middle + name[name.length - 1];
+    };
+
+    // ───────────────────────────────────────────────────────────────────────────────
+    // 3) “분석하기” 버튼 클릭 시 예측 API 호출 (기존 코드와 동일)
+    // ───────────────────────────────────────────────────────────────────────────────
     const handleAnalyze = async () => {
-        // 1) Context에 먼저 사용자 입력값 저장 (prsScore, systolic, firstExamAge, smoker)
         updateUserInfo({
-            // (이 예제에서는 기존 userInfo.age, userInfo.gender, userInfo.bloodSugar 등은
-            //  이미 로그인/프로필 단계에서 채워져 있다고 가정합니다.)
             systolic: Number(systolicInput),
             firstExamAge: Number(firstAgeInput),
             smoker: isSmoker,
         });
         updatePrsScore(Number(prsInput));
 
-        // 2) 예측 API 요청을 위해 requestBody 구성
-        //    API 스펙: { age, ASBP, sex, exam1_age, smoke, PRSice2 }
-        //    - age: userInfo.age (string or number)
-        //    - ASBP: 수축기 혈압(systolicInput)
-        //    - sex: gender -> 0 혹은 1 (예: female=0, male=1) 
-        //    - exam1_age: firstExamAge
-        //    - smoke: smoker?1:0
-        //    - PRSice2: PRS 점수(prsInput)
         const requestBody = {
             age: Number(userInfo.age || 50),
             ASBP: Number(systolicInput),
@@ -55,17 +92,10 @@ function MainPage() {
         };
 
         setIsLoading(true);
-
         try {
-            // 3) 실제 API 호출
             const response = await predictAtrialFibrillation(requestBody);
-            // PredictResponse 스펙에 따르면 response.data = { label: int, probabilities: [Double,...] }
             const { label, probabilities } = response.data;
-
-            // 4) 받은 결과를 Context에 저장
             updatePredictionResult({ label, probabilities });
-
-            // 5) AnalysisPage로 이동
             navigate("/analysis");
         } catch (err) {
             console.error("Predict API 호출 중 오류:", err);
@@ -82,7 +112,9 @@ function MainPage() {
         setIsSmoker(false);
     };
 
-    // 매거진 목록 로딩
+    // ───────────────────────────────────────────────────────────────────────────────
+    // 4) 매거진 목록 로딩 (기존 코드 그대로)
+    // ───────────────────────────────────────────────────────────────────────────────
     const [magazines, setMagazines] = useState([]);
     const [loadingMag, setLoadingMag] = useState(true);
     const [errorMag, setErrorMag] = useState(null);
@@ -94,7 +126,7 @@ function MainPage() {
                 setLoadingMag(false);
             })
             .catch((err) => {
-                console.error(err);
+                console.error("매거진 로딩 중 오류:", err);
                 setErrorMag("매거진을 불러오는 중 오류가 발생했습니다.");
                 setLoadingMag(false);
             });
@@ -103,6 +135,9 @@ function MainPage() {
     return (
         <div className="main-page">
             <div className="top-section">
+                {/* ─────────────────────────────────────────────────────────────────────── */}
+                {/* 좌측: PRS 분석 입력 폼 (기존과 동일)                              */}
+                {/* ─────────────────────────────────────────────────────────────────────── */}
                 <div className="left-form">
                     <h1 className="main-title">심방세동 발병 확률 분석</h1>
                     <p className="main-subtitle">
@@ -142,7 +177,7 @@ function MainPage() {
                         />
                     </div>
 
-                    {/* 흡연 여부 */}
+                    {/* 흡연 여부 토글 */}
                     <div className="input-group">
                         <span className="input-label">흡연 여부</span>
                         <div className="smoke-button-group">
@@ -176,39 +211,118 @@ function MainPage() {
                     </div>
                 </div>
 
-                {/* 우측 랭킹 (더미 데이터) */}
+                {/* ─────────────────────────────────────────────────────────────────────── */}
+                {/* 우측: 실시간 랭킹 영역 (API 연동 + 로그인 분기)                       */}
+                {/* ─────────────────────────────────────────────────────────────────────── */}
                 <div className="right-ranking">
                     <h2 className="ranking-title">
                         심방세동 발병 확률 랭킹
                         <button
                             className="refresh-button"
-                            onClick={() => alert("데이터 새로고침 예정")}
+                            onClick={() => {
+                                // “새로고침” 버튼 클릭 시 랭킹 다시 불러오기
+                                if (!isLoggedIn) {
+                                    setErrorRank("랭킹을 확인하려면 로그인을 해야합니다.");
+                                    return;
+                                }
+                                setLoadingRank(true);
+                                getRank()
+                                    .then((res) => {
+                                        setRankList(res.data || []);
+                                        setErrorRank(null);
+                                        setLoadingRank(false);
+                                    })
+                                    .catch((err) => {
+                                        console.error("랭킹 API 재호출 오류:", err);
+                                        setErrorRank("랭킹 정보를 불러오는 중 오류가 발생했습니다.");
+                                        setLoadingRank(false);
+                                    });
+                            }}
                         >
                             🔄
                         </button>
                     </h2>
-                    <div className="ranking-list">
-                        {[
-                            { id: 1, name: "김○영" },
-                            { id: 2, name: "박○연" },
-                            { id: 3, name: "최○래" },
-                            { id: 4, name: "송지은 (나)", value: 57 },
-                            { id: 5, name: "이○민", value: 154 },
-                        ].map((person, idx) => (
-                            <div key={person.id} className="ranking-item">
-                                {idx < 3 ? (
-                                    <span className="medal">{["🥇", "🥈", "🥉"][idx]}</span>
-                                ) : (
-                                    <span className="rank-circle">{person.value}</span>
-                                )}
-                                <span className="rank-name">{person.name}</span>
-                            </div>
-                        ))}
-                    </div>
+
+                    {/* 1) 로딩 중 */}
+                    {loadingRank && <p>랭킹 로딩 중…</p>}
+
+                    {/* 2) 로그인 안 된 경우 */}
+                    {!loadingRank && !isLoggedIn && (
+                        <p className="error">랭킹을 확인하려면 로그인을 해야합니다</p>
+                    )}
+
+                    {/* 3) 로그인 되어 있지만 API 호출 에러가 난 경우 */}
+                    {!loadingRank && isLoggedIn && errorRank && (
+                        <p className="error">{errorRank}</p>
+                    )}
+
+                    {/* 4) 로그인 되어 있고 에러도 없고 로딩도 끝났다면 “rankList” 렌더링 */}
+                    {!loadingRank && isLoggedIn && !errorRank && (
+                        <div className="ranking-list">
+                            {rankList.map((item, idx) => {
+                                const rankNum = item.rank;          // 1, 2, 3, 4(나), 5
+                                const rawName = item.userName || ""; // 실제 유저 이름
+
+                                // 1~3등일 때 메달 아이콘
+                                if (idx === 0) {
+                                    return (
+                                        <div key={rankNum} className="ranking-item">
+                                            <span className="medal">🥇</span>
+                                            <span className="rank-name">
+                                                {obscureName(rawName)}
+                                            </span>
+                                        </div>
+                                    );
+                                }
+                                if (idx === 1) {
+                                    return (
+                                        <div key={rankNum} className="ranking-item">
+                                            <span className="medal">🥈</span>
+                                            <span className="rank-name">
+                                                {obscureName(rawName)}
+                                            </span>
+                                        </div>
+                                    );
+                                }
+                                if (idx === 2) {
+                                    return (
+                                        <div key={rankNum} className="ranking-item">
+                                            <span className="medal">🥉</span>
+                                            <span className="rank-name">
+                                                {obscureName(rawName)}
+                                            </span>
+                                        </div>
+                                    );
+                                }
+
+                                // 4번째(인덱스 3) → “나”
+                                if (idx === 3) {
+                                    return (
+                                        <div key={rankNum} className="ranking-item">
+                                            <span className="rank-circle">{rankNum}</span>
+                                            <span className="rank-name">{obscureName(rawName)} (나)</span>
+                                        </div>
+                                    );
+                                }
+
+                                // 마지막(인덱스 4) → 꼴등
+                                return (
+                                    <div key={rankNum} className="ranking-item">
+                                        <span className="rank-circle">{rankNum}</span>
+                                        <span className="rank-name">
+                                            {obscureName(rawName)}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* 하단 매거진 섹션 */}
+            {/* ──────────────────────────────────────────────────────────────────────────── */}
+            {/* 하단 매거진 섹션 (기존 코드와 동일)                                         */}
+            {/* ──────────────────────────────────────────────────────────────────────────── */}
             <div className="bottom-magazine">
                 <h2 className="magazine-title">건강 매거진</h2>
                 <p className="magazine-subtext">
@@ -228,7 +342,6 @@ function MainPage() {
                             >
                                 <div className="magazine-text">
                                     <h2>{item.title}</h2>
-                                    {/* 첫 줄(1줄)만 보여주기 */}
                                     <p>{item.content.split("\n")[0]}</p>
                                 </div>
                             </Link>
