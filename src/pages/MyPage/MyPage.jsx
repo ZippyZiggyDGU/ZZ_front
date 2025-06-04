@@ -3,9 +3,8 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import "./MyPage.css";
 import EditModal from "../../components/EditModal/EditModal.jsx";
-import { recordData } from "../../api/recordData.js";
-import { UserContext } from "../../contexts/UserContext"; // ← 추가
-import { getMypage } from "../../api/mypage.js";           // ← 추가
+import { UserContext } from "../../contexts/UserContext";
+import { getMypage, getLogs } from "../../api/mypage.js"; // <-- getMypage, getLogs 헬퍼
 
 import {
     LineChart,
@@ -19,29 +18,38 @@ import {
 
 function MyPage() {
     const navigate = useNavigate();
-    const {
-        userInfo,
-        updateUserInfo,
-        logoutUser,
-    } = useContext(UserContext); // Context에서 logoutUser, userInfo, updateUserInfo 가져오기
+    const { userInfo, updateUserInfo, logoutUser } = useContext(UserContext);
 
+    // 날짜 필터 기본값
     const [startDate, setStartDate] = useState("2025-01-01");
     const [endDate, setEndDate] = useState(() =>
         new Date().toISOString().split("T")[0]
     );
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isSearched, setIsSearched] = useState(false);
-    const [filteredRecords, setFilteredRecords] = useState([]);
 
-    // ─────────────────────────────────────────────────────────────────────────────
-    // 0) 마운트 시: /mypage API 호출 → userName, gender, birth, age 가져와서 Context도 업데이트
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 1) isSearched 상태 복원 (조회 버튼을 눌렀는지 여부)
+    const [isSearched, setIsSearched] = useState(false);
+
+    // 2) 서버에서 가져온 전체 로그
+    //    ModelLogResponse: { testDate: "YYYY-MM-DD", result: double } 
+    //    → 소수(0.114) 형태로 오면 percent: result * 100 으로 표시
+    const [allLogs, setAllLogs] = useState([]);
+
+    // 3) 날짜 범위에 맞춰 필터된 로그 배열
+    //    각 원소 형태: { date: "2025-06-01", percent: 11.4, diff:  +0.6  }
+    const [filteredLogs, setFilteredLogs] = useState([]);
+
+    // 4) 모달(비밀번호 변경) 오픈 여부
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // ───────────────────────────────────────────────────────────────────────────
+    // 마운트 시 ① /mypage API → 사용자 정보 가져와서 Context 업데이트
+    // ───────────────────────────────────────────────────────────────────────────
     useEffect(() => {
         getMypage()
             .then((res) => {
                 const { userName, gender, birth, age } = res.data;
                 updateUserInfo({
-                    userName, // Context에 userName이 없다면, store해 두거나 생략하셔도 됩니다.
+                    userName,
                     age,
                     gender: gender === 0 ? "male" : "female",
                 });
@@ -51,35 +59,81 @@ function MyPage() {
             });
     }, [updateUserInfo]);
 
-    // 로그아웃 버튼 클릭 시
-    const handleLogout = () => {
-        logoutUser();       // Context의 logoutUser → 토큰 삭제 + isLoggedIn=false
-        navigate("/login"); // 로그인 페이지로 리다이렉트
-    };
+    // ───────────────────────────────────────────────────────────────────────────
+    // 마운트 시 ② /get-logs API → allLogs 상태에 저장
+    // ───────────────────────────────────────────────────────────────────────────
+    useEffect(() => {
+        getLogs()
+            .then((res) => {
+                // res.data === [ { testDate: "2025-06-01", result: 0.114 }, … ]
+                const logsFromServer = res.data.map((item) => ({
+                    date: item.testDate,          // e.g. "2025-06-01"
+                    percent: +(item.result * 100).toFixed(1), // 0.114 → 11.4
+                }));
+                setAllLogs(logsFromServer);
+            })
+            .catch((err) => {
+                console.error("MyPage: /get-logs 호출 오류:", err);
+            });
+    }, []);
 
+    // ───────────────────────────────────────────────────────────────────────────
+    // 날짜 조회 버튼 또는 allLogs 업데이트 시 필터링 실행
+    // ───────────────────────────────────────────────────────────────────────────
     const handleSearch = () => {
-        const results = recordData.filter((record) => {
-            return record.date >= startDate && record.date <= endDate;
-        });
-        const sorted = [...results].sort(
-            (a, b) => new Date(a.date) - new Date(b.date)
+        // 문자열 비교를 이용한 날짜 범위 필터링
+        const results = allLogs.filter(
+            (record) => record.date >= startDate && record.date <= endDate
         );
-        setFilteredRecords(sorted);
+
+        // 날짜 오름차순 정렬
+        const sorted = [...results].sort((a, b) =>
+            a.date.localeCompare(b.date)
+        );
+
+        // 변화량(diff) 계산: 이전 항목과 비교해서 퍼센트 차이 구하기
+        const withDiff = sorted.map((rec, idx, arr) => {
+            if (idx === 0) {
+                return { ...rec, diff: null };
+            } else {
+                const prev = arr[idx - 1];
+                const diffValue = +(rec.percent - prev.percent).toFixed(1);
+                return { ...rec, diff: diffValue };
+            }
+        });
+
+        setFilteredLogs(withDiff);
         setIsSearched(true);
     };
 
+    // allLogs가 서버에서 바뀔 때마다 자동으로 handleSearch 실행
+    // → 페이지 로드 후 API가 들어오면 바로 조회 상태가 true가 됩니다.
     useEffect(() => {
-        // 페이지 로딩 시 최초 조회
-        handleSearch();
-    }, []);
+        if (allLogs.length > 0) {
+            handleSearch();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [allLogs]);
 
+    // ───────────────────────────────────────────────────────────────────────────
+    // 모달 제어
+    // ───────────────────────────────────────────────────────────────────────────
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
+
+    // ───────────────────────────────────────────────────────────────────────────
+    // 로그아웃 버튼 클릭 → Context 로그아웃 + 로그인 페이지로 리다이렉트
+    // ───────────────────────────────────────────────────────────────────────────
+    const handleLogout = () => {
+        logoutUser();
+        navigate("/login");
+    };
 
     return (
         <div className="mypage-container">
             {/* ──────────────────────────────────────────────────────────────── */}
-            {/* 상단 사용자 정보 + 로그아웃/비밀번호 변경 버튼 영역 */}
+            {/* 상단: 사용자 정보 + 로그아웃/비밀번호 변경 버튼                 */}
+            {/* ──────────────────────────────────────────────────────────────── */}
             <div className="mypage-header">
                 <div className="greeting">
                     <h2>{userInfo.userName} 님</h2>
@@ -87,11 +141,9 @@ function MyPage() {
                 </div>
 
                 <div className="mypage-actions">
-                    {/* 로그아웃 버튼 */}
                     <button className="logout-button" onClick={handleLogout}>
                         로그아웃
                     </button>
-                    {/* 비밀번호 변경 버튼 */}
                     <button className="edit-button" onClick={openModal}>
                         비밀번호 변경
                     </button>
@@ -121,25 +173,30 @@ function MyPage() {
                     </button>
                 </div>
 
+                {/* ──────────────────────────────────────────────────────────── */}
+                {/* isSearched가 true일 때만 “조회 결과” 영역을 보여줌        */}
+                {/* ──────────────────────────────────────────────────────────── */}
                 {isSearched && (
                     <>
+                        {/* ──────────────────────────────────────────────────────── */}
+                        {/* 1) 필터된 로그 카드 (날짜 / 퍼센트 / 증감량)         */}
+                        {/* ──────────────────────────────────────────────────────── */}
                         <div className="record-cards">
-                            {filteredRecords.map((record, index) => {
-                                const previousScore =
-                                    index > 0 ? filteredRecords[index - 1].score : null;
-                                const difference =
-                                    previousScore !== null
-                                        ? record.score - previousScore
-                                        : null;
+                            {filteredLogs.map((record) => {
                                 return (
                                     <div className="record-card" key={record.date}>
                                         <p className="date">{record.date}</p>
-                                        <p className="score">{record.score}점</p>
-                                        {difference !== null && (
-                                            <p className="change">
-                                                {difference >= 0
-                                                    ? `+${difference}점`
-                                                    : `${difference}점`}
+                                        <p className="score">{record.percent.toFixed(1)}%</p>
+                                        {record.diff !== null && (
+                                            <p
+                                                className="change"
+                                                style={{
+                                                    color: record.diff >= 0 ? "#f28c28" : "#2e8b57",
+                                                }}
+                                            >
+                                                {record.diff >= 0
+                                                    ? `+${record.diff.toFixed(1)}%`
+                                                    : `${record.diff.toFixed(1)}%`}
                                             </p>
                                         )}
                                     </div>
@@ -147,21 +204,35 @@ function MyPage() {
                             })}
                         </div>
 
+                        {/* ──────────────────────────────────────────────────────── */}
+                        {/* 2) 그래프: filteredLogs → 퍼센트 변화를 선 그래프로 표시 */}
+                        {/* ──────────────────────────────────────────────────────── */}
                         <div className="graph-container">
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart
-                                    data={filteredRecords}
+                                    data={filteredLogs}
                                     margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
                                 >
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="date" />
-                                    <YAxis />
-                                    <Tooltip />
+                                    <YAxis
+                                        unit="%"
+                                        domain={[
+                                            (dataMin) => Math.floor(dataMin) - 5,
+                                            (dataMax) => Math.ceil(dataMax) + 5,
+                                        ]}
+                                    />
+                                    <Tooltip
+                                        formatter={(value) => `${value.toFixed(1)}%`}
+                                        labelFormatter={(label) => `날짜: ${label}`}
+                                    />
                                     <Line
                                         type="monotone"
-                                        dataKey="score"
+                                        dataKey="percent"
                                         stroke="#F28C28"
                                         strokeWidth={3}
+                                        dot={{ r: 4 }}
+                                        activeDot={{ r: 6 }}
                                     />
                                 </LineChart>
                             </ResponsiveContainer>

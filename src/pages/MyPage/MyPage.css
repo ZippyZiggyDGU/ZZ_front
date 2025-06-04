@@ -138,3 +138,10 @@
 .logout-button:hover {
     background-color: #b3b3b3;
 }
+
+/* ① .mypage-actions 에 flex와 gap을 추가 */
+.mypage-actions {
+    display: flex;
+    gap: 10px;
+    /* 버튼 사이 10px 여백 */
+}
