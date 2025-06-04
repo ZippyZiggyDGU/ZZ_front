@@ -69,6 +69,7 @@ function MainPage() {
         setLoadingRank(true);
         getRank()
             .then((res) => {
+                console.log("getRank 응답 →", res.data);
                 setRankList(res.data || []);
                 setErrorRank(null);
                 setLoadingRank(false);
