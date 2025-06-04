@@ -245,6 +245,14 @@ input::placeholder {
     font-size: 15px;
     color: #555;
     line-height: 1.4;
+        /* “한 줄 요약” : 넘치는 텍스트는 ...으로 자동 생략 */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
+    /* 한 줄만 보여주고 나머지 ... 처리 */
+    line-clamp: 1;
+    /* 표준 속성(호환성을 위해 추가) */
 }
 /* src/pages/MainPage.css 에 추가 */
 

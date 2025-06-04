@@ -333,20 +333,20 @@ function MainPage() {
                 ) : errorMag ? (
                     <p className="error">{errorMag}</p>
                 ) : (
-                    <div className="magazine-cards">
-                        {magazines.map((item) => (
-                            <Link
-                                to={`/magazine/${item.id}`}
-                                key={item.id}
-                                className="magazine-card"
-                            >
-                                <div className="magazine-text">
-                                    <h2>{item.title}</h2>
-                                    <p>{item.content.split("\n")[0]}</p>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
+                            <div className="magazine-cards">
+                                {magazines.map((item) => (
+                                    <Link
+                                        to={`/magazine/${item.id}`}
+                                        key={item.id}
+                                        className="magazine-card"
+                                    >
+                                        <div className="magazine-text">
+                                            <h4>{item.title}</h4>
+                                            <p>{item.content.split("\n")[0]}</p>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
                 )}
             </div>
 
