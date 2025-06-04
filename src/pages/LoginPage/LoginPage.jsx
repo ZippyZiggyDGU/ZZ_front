@@ -11,7 +11,7 @@ function LoginPage() {
     const [autoLogin, setAutoLogin] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
-    const { loginUser } = useContext(UserContext);
+    const { loginUser, updateUserInfo } = useContext(UserContext);
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
@@ -22,6 +22,7 @@ function LoginPage() {
         }
         setLoading(true);
         try {
+            // ① login() 호출 → userId: email, password, rememberMe
             const response = await login({
                 userId: email,
                 password,
@@ -30,15 +31,18 @@ function LoginPage() {
 
             const { accessToken, refreshToken } = response.data;
 
-            // 1) Context 상태 업데이트
+            // ② Context 상태 업데이트
+            //    - loginUser: 토큰 저장 + isLoggedIn=true
+            //    - updateUserInfo: userId(email)를 Context에 저장
             loginUser(accessToken);
+            updateUserInfo({ userId: email });
 
-            // 2) 로컬 스토리지에 토큰 보관(원한다면)
+            // ③ 로컬 스토리지에 토큰 보관(원한다면)
             localStorage.setItem("accessToken", accessToken);
             localStorage.setItem("refreshToken", refreshToken);
 
-            // 3) **API 인스턴스의 기본 헤더에 토큰을 붙여주자**
-            //    이후 모든 api 호출 시 자동으로 Authorization 헤더가 추가됩니다.
+            // ④ Axios 인스턴스 기본 헤더에 토큰을 붙임
+            //    → 이후 모든 api 호출 시 자동으로 Authorization 헤더가 추가됨
             api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
             alert("로그인 성공!");

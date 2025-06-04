@@ -25,6 +25,7 @@ export function changePassword(request) {
     return api.patch("/change-pw", request);
 }
 
+
 // -----
 // ↓ 여기서 default export로 인스턴스를 내보냅니다.
 //    앱 어디서든 `import api from "…/auth.js"` 를 쓰면, 

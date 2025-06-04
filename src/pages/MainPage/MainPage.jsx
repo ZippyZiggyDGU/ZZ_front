@@ -46,7 +46,7 @@ function MainPage() {
         //    - smoke: smoker?1:0
         //    - PRSice2: PRS 점수(prsInput)
         const requestBody = {
-            age: Number(userInfo.age || 20),
+            age: Number(userInfo.age || 50),
             ASBP: Number(systolicInput),
             sex: userInfo.gender === "male" ? 1 : 0,
             exam1_age: Number(firstAgeInput),

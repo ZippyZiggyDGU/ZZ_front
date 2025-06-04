@@ -1,5 +1,6 @@
-/* src/pages/AnalysisPage.css */
-
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 전체 페이지 기본 레이아웃                                                    */
+/* ───────────────────────────────────────────────────────────────────────────── */
 .analysis-page {
     background-color: #fff8f0;
     min-height: 100vh;
@@ -33,7 +34,9 @@
     margin-bottom: 40px;
 }
 
-/* 랭킹 섹션 */
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 1) 랭킹 섹션                                                                 */
+/* ───────────────────────────────────────────────────────────────────────────── */
 .ranking-section {
     max-width: 600px;
     margin: 0 auto 50px auto;
@@ -92,7 +95,10 @@
     font-size: 16px;
 }
 
-/* 매거진 추천 섹션 */
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 2) 매거진 추천 섹션                                                         */
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* ── 큰 틀 ───────────────────────────────────────────────────────────────────── */
 .recommendation-section {
     max-width: 800px;
     margin: 0 auto;
@@ -108,20 +114,27 @@
     margin-bottom: 20px;
 }
 
+/* magazine-cards 컨테이너: 가로로 늘어뜨리고, 줄바꿈 허용 */
 .recommendation-section .magazine-cards {
     display: flex;
     gap: 24px;
     flex-wrap: wrap;
 }
 
+/* 각 카드 (= <Link> 가 실제 <a>로 렌더링) */
 .recommendation-section .magazine-card {
+    display: block;
+    /* 블록 레벨로 만들어 줘야 width가 먹습니다 */
     background-color: #fff8f0;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 0 1px #e0e0e0;
     text-decoration: none;
+    /* 밑줄 제거 */
     color: inherit;
+    /* 부모 컬러 그대로 상속 */
     width: calc(50% - 12px);
+    /* 가로 2개씩 배치 (50% - gap/2) */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -140,9 +153,20 @@
     font-size: 14px;
     line-height: 1.4;
     color: #555;
+
+    /* “한 줄 요약” : 넘치는 텍스트는 ...으로 자동 생략 */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
+    /* 한 줄만 보여주고 나머지 ... 처리 */
+    line-clamp: 1;
+    /* 표준 속성(호환성을 위해 추가) */
 }
 
-/* 에러 메시지 */
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 3) 에러 메시지                                                               */
+/* ───────────────────────────────────────────────────────────────────────────── */
 .error {
     color: red;
     font-size: 14px;

@@ -129,3 +129,12 @@
     padding: 20px;
     border-radius: 12px;
 }
+
+.logout-button {
+    background-color: #ccc;
+    color: #fff;
+}
+
+.logout-button:hover {
+    background-color: #b3b3b3;
+}
