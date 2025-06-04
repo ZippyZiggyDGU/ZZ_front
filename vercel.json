@@ -3,7 +3,7 @@
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "http://52.79.156.162/$1"
+            "destination": "http://www.zippyziggy.site/$1"
         }
     ]
 }
