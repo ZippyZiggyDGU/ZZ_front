@@ -224,14 +224,7 @@ input::placeholder {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
-.magazine-card::before {
-    content: "";
-    width: 70px;
-    height: 70px;
-    background-color: #ddd;
-    border-radius: 8px;
-    flex-shrink: 0;
-}
+
 
 .magazine-text h2 {
     font-size: 20px;

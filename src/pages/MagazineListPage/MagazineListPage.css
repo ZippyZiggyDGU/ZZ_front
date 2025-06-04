@@ -39,15 +39,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.magazine-card::before {
-    content: "";
-    width: 70px;
-    height: 70px;
-    background-color: #ddd;
-    border-radius: 8px;
-    flex-shrink: 0;
-}
-
 .magazine-card h2 {
     font-size: 20px;
     margin: 0 0 8px 0;

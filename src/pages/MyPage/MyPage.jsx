@@ -5,6 +5,7 @@ import "./MyPage.css";
 import EditModal from "../../components/EditModal/EditModal.jsx";
 import { recordData } from "../../api/recordData.js";
 import { UserContext } from "../../contexts/UserContext"; // ← 추가
+import { getMypage } from "../../api/mypage.js";           // ← 추가
 
 import {
     LineChart,
@@ -18,7 +19,11 @@ import {
 
 function MyPage() {
     const navigate = useNavigate();
-    const { logoutUser } = useContext(UserContext); // ← UserContext에서 logoutUser 가져오기
+    const {
+        userInfo,
+        updateUserInfo,
+        logoutUser,
+    } = useContext(UserContext); // Context에서 logoutUser, userInfo, updateUserInfo 가져오기
 
     const [startDate, setStartDate] = useState("2025-01-01");
     const [endDate, setEndDate] = useState(() =>
@@ -28,10 +33,28 @@ function MyPage() {
     const [isSearched, setIsSearched] = useState(false);
     const [filteredRecords, setFilteredRecords] = useState([]);
 
-    // 로그아웃 버튼 클릭 시 실행
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 0) 마운트 시: /mypage API 호출 → userName, gender, birth, age 가져와서 Context도 업데이트
+    // ─────────────────────────────────────────────────────────────────────────────
+    useEffect(() => {
+        getMypage()
+            .then((res) => {
+                const { userName, gender, birth, age } = res.data;
+                updateUserInfo({
+                    userName, // Context에 userName이 없다면, store해 두거나 생략하셔도 됩니다.
+                    age,
+                    gender: gender === 0 ? "male" : "female",
+                });
+            })
+            .catch((err) => {
+                console.error("MyPage: /mypage 호출 오류:", err);
+            });
+    }, [updateUserInfo]);
+
+    // 로그아웃 버튼 클릭 시
     const handleLogout = () => {
-        logoutUser();      // Context에 정의된 logoutUser 호출 (토큰 삭제 + isLoggedIn false)
-        navigate("/login"); // 로그아웃 후 로그인 페이지로 이동
+        logoutUser();       // Context의 logoutUser → 토큰 삭제 + isLoggedIn=false
+        navigate("/login"); // 로그인 페이지로 리다이렉트
     };
 
     const handleSearch = () => {
@@ -59,7 +82,7 @@ function MyPage() {
             {/* 상단 사용자 정보 + 로그아웃/비밀번호 변경 버튼 영역 */}
             <div className="mypage-header">
                 <div className="greeting">
-                    <h2>송지은 님</h2>
+                    <h2>{userInfo.userName} 님</h2>
                     <p>안녕하세요, 오늘도 건강한 하루 되세요</p>
                 </div>
 
@@ -125,10 +148,7 @@ function MyPage() {
                         </div>
 
                         <div className="graph-container">
-                            <ResponsiveContainer
-                                width="100%"
-                                height={300}
-                            >
+                            <ResponsiveContainer width="100%" height={300}>
                                 <LineChart
                                     data={filteredRecords}
                                     margin={{ top: 20, right: 30, left: 0, bottom: 0 }}

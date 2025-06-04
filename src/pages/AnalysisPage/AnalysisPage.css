@@ -114,54 +114,57 @@
     margin-bottom: 20px;
 }
 
-/* magazine-cards 컨테이너: 가로로 늘어뜨리고, 줄바꿈 허용 */
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* AnalysisPage.css (매거진 부분만 떼어낸 예시)                                */
+/* ───────────────────────────────────────────────────────────────────────────── */
 .recommendation-section .magazine-cards {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
+    display: grid;
+    /* ← flex → grid 로 변경 */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 36px;
+    /* MainPage와 동일한 간격으로 */
 }
 
-/* 각 카드 (= <Link> 가 실제 <a>로 렌더링) */
+/* 카드 내부 레이아웃은 MainPage와 동일하게 맞춥니다 */
 .recommendation-section .magazine-card {
-    display: block;
-    /* 블록 레벨로 만들어 줘야 width가 먹습니다 */
-    background-color: #fff8f0;
-    padding: 20px;
-    border-radius: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    background-color: #FFF8F0;
+    padding: 10px;
+    border-radius: 12px;
     box-shadow: 0 0 0 1px #e0e0e0;
     text-decoration: none;
-    /* 밑줄 제거 */
     color: inherit;
-    /* 부모 컬러 그대로 상속 */
-    width: calc(50% - 12px);
-    /* 가로 2개씩 배치 (50% - gap/2) */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.4s ease, box-shadow 0.4s ease, background-color 0.4s ease;
+    width: 100%;
+    /* grid 안에서 100% 차지 → 두 칸씩 정렬 */
+    cursor: pointer;
 }
 
 .recommendation-section .magazine-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: scale(1.08);
+    background-color: #ffe2bb;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
 .recommendation-section .magazine-text h4 {
-    font-size: 18px;
-    margin-bottom: 8px;
+    font-size: 20px;
+    margin: 0 0 8px 0;
     font-weight: bold;
+    line-height: 1.4;
 }
 
 .recommendation-section .magazine-text p {
-    font-size: 14px;
-    line-height: 1.4;
+    margin: 0;
+    font-size: 15px;
     color: #555;
-
-    /* “한 줄 요약” : 넘치는 텍스트는 ...으로 자동 생략 */
+    line-height: 1.4;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     overflow: hidden;
     -webkit-line-clamp: 1;
-    /* 한 줄만 보여주고 나머지 ... 처리 */
     line-clamp: 1;
-    /* 표준 속성(호환성을 위해 추가) */
 }
 
 /* ───────────────────────────────────────────────────────────────────────────── */

@@ -1,16 +1,16 @@
-// src/pages/AnalysisPage.jsx
+// src/pages/AnalysisPage/AnalysisPage.jsx
 import { useContext, useState, useEffect } from "react";
 import { UserContext } from "../../contexts/UserContext";
-import { getRecommend } from "../../api/recommend.js"; // 매거진 추천 API 함수
-import { getRank } from "../../api/rank.js";             // 랭킹 API 함수
-import { Link } from "react-router-dom";
+import { getRecommend } from "../../api/recommend.js"; // 매거진 추천 API
+import { getRank } from "../../api/rank.js";             // 랭킹 API
 import "./AnalysisPage.css";
+import { Link } from "react-router-dom";
 
 function AnalysisPage() {
     // 1) Context에서 필요한 값 불러오기
     const { userInfo, predictionResult, isLoggedIn } = useContext(UserContext);
     const { label, probabilities } = predictionResult;
-    const userId = userInfo.userId; // 로그인 시 UserContext에 저장해 둔 userId
+    const userId = userInfo.userId; // 로그인 시 UserContext에 저장된 userId
 
     // 2) 추천 매거진 상태
     const [magazines, setMagazines] = useState([]);
@@ -18,17 +18,13 @@ function AnalysisPage() {
     const [errorMag, setErrorMag] = useState(null);
 
     // 3) 랭킹 상태
-    //    - API에서 항상 5개의 객체(인덱스 0~4)가 내려온다고 가정
-    //      [ { rank:1, userName:"..." }, { rank:2, userName:"..." }, { rank:3, userName:"..." },
-    //        { rank:4, userName:"실제이름" }, // “나” 자리에 해당
-    //        { rank:5, userName:"다른이름" } ]
     const [rankList, setRankList] = useState([]);
     const [loadingRank, setLoadingRank] = useState(true);
     const [errorRank, setErrorRank] = useState(null);
 
-    // ───────────────────────────────────────────────────────────────────────────────
-    // 4) 예측 결과가 없으면 간단 안내 후 리턴
-    // ───────────────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 4) 예측 결과가 없으면 안내 후 리턴
+    // ─────────────────────────────────────────────────────────────────────────────
     if (label === null || probabilities.length === 0) {
         return (
             <div className="analysis-page">
@@ -38,9 +34,9 @@ function AnalysisPage() {
         );
     }
 
-    // ───────────────────────────────────────────────────────────────────────────────
-    // 5) 예측 확률 계산 (예: AF 발병 확률은 probabilities[1])
-    // ───────────────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 5) 예측 확률 계산 (AF 발병 확률은 probabilities[1])
+    // ─────────────────────────────────────────────────────────────────────────────
     const afProbability = probabilities[1] ?? 0;
     let recommendationText = "";
     if (afProbability >= 0.75) {
@@ -53,9 +49,9 @@ function AnalysisPage() {
         recommendationText = "비교적 낮은 위험도입니다. 좋은 습관을 계속 유지하세요!";
     }
 
-    // ───────────────────────────────────────────────────────────────────────────────
-    // 6) 매거진 추천 API 호출 (componentDidMount 역할)
-    // ───────────────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 6) 매거진 추천 API 호출 (컴포넌트 마운트 시)
+    // ─────────────────────────────────────────────────────────────────────────────
     useEffect(() => {
         if (!userId) {
             setErrorMag("사용자 정보가 없어 매거진을 불러올 수 없습니다.");
@@ -76,18 +72,15 @@ function AnalysisPage() {
             });
     }, [userId]);
 
-    // ───────────────────────────────────────────────────────────────────────────────
-    // 7) 랭킹 API 호출 (componentDidMount 역할)
-    // ───────────────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 7) 랭킹 API 호출 (컴포넌트 마운트 시)
+    // ─────────────────────────────────────────────────────────────────────────────
     useEffect(() => {
-        // 1) 로그인되지 않으면 랭킹 API 호출하지 않고, 안내 메시지를 보여줌
         if (!isLoggedIn) {
             setErrorRank("랭킹을 확인하려면 로그인을 해야합니다.");
             setLoadingRank(false);
             return;
         }
-
-        // 2) 로그인된 상태라면 /rank 호출
         setLoadingRank(true);
         getRank()
             .then((res) => {
@@ -102,11 +95,9 @@ function AnalysisPage() {
             });
     }, [isLoggedIn]);
 
-    // ───────────────────────────────────────────────────────────────────────────────
-    // 8) 이름 가운데를 "*"로 가려주는 헬퍼 함수
-    //    - 길이가 2 이하이면 그대로 반환
-    //    - 길이가 그 이상이면 첫 글자 + 중간(*) + 마지막 글자
-    // ───────────────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────────
+    // 8) 이름 가운데를 "*"로 가려주는 헬퍼
+    // ─────────────────────────────────────────────────────────────────────────────
     const obscureName = (name) => {
         if (!name) return "";
         if (name.length <= 2) return name;
@@ -116,25 +107,21 @@ function AnalysisPage() {
 
     return (
         <div className="analysis-page">
-            {/* ──────────────────────────────────────────────────────────────────────────── */}
-            {/* 1. 페이지 상단: 예측 결과 출력                                           */}
-            {/* ──────────────────────────────────────────────────────────────────────────── */}
+            {/* 1) 페이지 상단: 예측 결과 */}
             <h1>심방세동 분석 결과</h1>
             <h2 className="highlight">
-                당신의 심방세동 발병 확률은 <span>{(afProbability * 100).toFixed(1)}%</span>입니다.
+                당신의 심방세동 발병 확률은{" "}
+                <span>{(afProbability * 100).toFixed(1)}%</span>입니다.
             </h2>
             <p className="recommendation">{recommendationText}</p>
 
-            {/* ──────────────────────────────────────────────────────────────────────────── */}
-            {/* 2. 랭킹 섹션                                                           */}
-            {/* ──────────────────────────────────────────────────────────────────────────── */}
+            {/* 2) 랭킹 섹션 */}
             <div className="ranking-section">
                 <h3>
                     심방세동 발병 확률 랭킹
                     <button
                         className="refresh-button"
                         onClick={() => {
-                            // 새로고침 버튼을 눌렀을 때, 로그인 상태라면 다시 API 호출
                             if (!isLoggedIn) {
                                 setErrorRank("랭킹을 확인하려면 로그인을 해야합니다.");
                                 return;
@@ -157,37 +144,19 @@ function AnalysisPage() {
                     </button>
                 </h3>
 
-                {/*
-          2-1) 로딩 중
-        */}
                 {loadingRank && <p>랭킹 로딩 중…</p>}
-
-                {/*
-          2-2) 로그인 안 된 경우
-        */}
                 {!loadingRank && !isLoggedIn && (
                     <p className="error">랭킹을 확인하려면 로그인을 해야합니다</p>
                 )}
-
-                {/*
-          2-3) 로그인 되었지만 API 호출 에러가 난 경우
-        */}
                 {!loadingRank && isLoggedIn && errorRank && (
                     <p className="error">{errorRank}</p>
                 )}
-
-                {/*
-          2-4) 로그인 되었고, 에러도 없으며, 로딩도 끝났다면 실제 랭킹 렌더
-          - rankList는 항상 길이가 5라고 가정
-            인덱스 0→1등, 1→2등, 2→3등, 3→4등(“나”), 4→5등(“꼴등”)
-        */}
                 {!loadingRank && isLoggedIn && !errorRank && (
                     <div className="ranking-list">
                         {rankList.map((item, idx) => {
-                            const rankNum = item.rank;          // 실제 등수 (1~5)
-                            const rawName = item.userName || ""; // 실사용 이름
+                            const rankNum = item.rank;
+                            const rawName = item.userName || "";
 
-                            // 1~3등 : 메달 이모지 + 가운데 * 처리된 이름
                             if (idx === 0) {
                                 return (
                                     <div key={rankNum} className="ranking-item">
@@ -212,18 +181,18 @@ function AnalysisPage() {
                                     </div>
                                 );
                             }
-
-                            // 4번째(인덱스 3) : 무조건 “나” (rank circle + “나”)
                             if (idx === 3) {
+                                // “나” 자리
                                 return (
                                     <div key={rankNum} className="ranking-item">
                                         <span className="rank-circle">{rankNum}</span>
-                                        <span className="rank-name">{obscureName(rawName)} (나)</span>
+                                        <span className="rank-name">
+                                            {obscureName(rawName)} (나)
+                                        </span>
                                     </div>
                                 );
                             }
-
-                            // 마지막(인덱스 4) : 꼴등 (rank circle + * 처리된 이름)
+                            // 마지막(인덱스 4) 꼴등
                             return (
                                 <div key={rankNum} className="ranking-item">
                                     <span className="rank-circle">{rankNum}</span>
@@ -235,9 +204,7 @@ function AnalysisPage() {
                 )}
             </div>
 
-            {/* ──────────────────────────────────────────────────────────────────────────── */}
-            {/* 3. 사용자 정보 기반 매거진 추천 섹션                                      */}
-            {/* ──────────────────────────────────────────────────────────────────────────── */}
+            {/* 3) 사용자 정보 기반 매거진 추천 섹션 */}
             <div className="recommendation-section">
                 <h3>
                     {userInfo.age}세{" "}
