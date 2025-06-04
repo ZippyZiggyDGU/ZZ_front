@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080",
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     withCredentials: true,  // 세션 쿠키 방식을 써도, 혹은 CSRF 토큰 등을 쓸 예정이라면 true
 });
 
