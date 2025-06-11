@@ -50,7 +50,7 @@ html {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 64px 64px 32px;
+    padding: 64px 64px 32px 16px;
 }
 
 .magazine-content {
