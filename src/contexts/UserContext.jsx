@@ -54,7 +54,6 @@ export function UserProvider({ children }) {
 
     // 로그인 시: 토큰 저장 + 로그인 상태 true
     const loginUser = (accessToken) => {
-        localStorage.setItem("accessToken", accessToken);
         setIsLoggedIn(true);
     };
 

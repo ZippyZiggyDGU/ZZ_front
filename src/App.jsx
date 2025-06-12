@@ -16,61 +16,46 @@ import MagazinePage from "./pages/MagazinePage/MagazinePage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// ————————————————————————————————————————————————
-// 1) 로컬스토리지에 accessToken이 있으면 바로 헤더에 붙여두기
-// ————————————————————————————————————————————————
-const savedAccessToken = localStorage.getItem("accessToken");
-if (savedAccessToken) {
-  api.defaults.headers.common["Authorization"] = `Bearer ${savedAccessToken}`;
-}
-
-// ————————————————————————————————————————————————
-// AppContent: 실제 라우터를 렌더링하는 부분
-// ————————————————————————————————————————————————
+/**
+ * AppContent 컴포넌트:
+ *  - UserProvider 내부이므로 UserContext를 자유롭게 사용할 수 있습니다.
+ *  - 앱 마운트 시 로컬/세션 스토리지에 남은 토큰을 읽어서 로그인 상태 복원
+ *  - 3초마다 콘솔에 로그인 상태(isLoggedIn)를 출력 (디버그 용)
+ *  - Router, Header, Routes를 렌더링
+ */
 function AppContent() {
-  const { isLoggedIn, loginUser, updateUserInfo } = useContext(UserContext);
+  const { loginUser, updateUserInfo, isLoggedIn } = useContext(UserContext);
 
-  // ————————————————————————————————————————————————
-  // 2) 자동 로그인 처리: 저장된 토큰이 있으면 Context에 로그인 상태 반영
-  //    & /mypage API 호출로 간단히 사용자 정보(userName, gender, age)도 채워두기
-  // ————————————————————————————————————————————————
+  // 1) 앱 시작 시: 저장된 토큰이 있으면 axios 헤더와 Context 복원
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    if (!token) return;
 
-    // ① Axios 인스턴스에도 헤더 보장
-    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    // ② Context에 로그인 상태로 표시
-    loginUser(token);
+    if (token) {
+      // axios 기본 헤더에 토큰 붙이기
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-    // ③ (선택) 유저 프로필 API로 추가 정보 가져오기
-    api
-      .get("/mypage")
-      .then((res) => {
-        const { userId, userName, gender, age } = res.data;
-        updateUserInfo({
-          userId,
-          userName,
-          // 백엔드가 gender=0/1이라면 이렇게 변환
-          gender: gender === 0 ? "male" : "female",
-          age,
-        });
-      })
-      .catch((err) => {
-        console.error("자동 로그인 중 /mypage 호출 오류:", err);
-      });
+      // Context 로그인 상태(true)로 변경
+      loginUser(token);
+
+      // (선택) /mypage 호출해서 유저 정보(age, gender 등) Context에 업데이트
+      // import { getMypage } from "./api/mypage.js";
+      // getMypage().then(res => {
+      //   const { userName, gender, birth, age } = res.data;
+      //   updateUserInfo({
+      //     userName,
+      //     gender: gender === 0 ? "male" : "female",
+      //     age,
+      //   });
+      // });
+    }
   }, [loginUser, updateUserInfo]);
 
-  // ————————————————————————————————————————————————
-  // 3) 디버그: 로그인 상태 3초마다 찍어보기
-  // ————————————————————————————————————————————————
+  // 2) 디버그: isLoggedIn 변경 시 콘솔에 찍기
   useEffect(() => {
-    let id;
-    if (isLoggedIn) {
-      id = setInterval(() => {
-        console.log("[디버그] isLoggedIn:", isLoggedIn);
-      }, 3000);
-    }
+    if (!isLoggedIn) return;
+    const id = setInterval(() => {
+      console.log("[디버그] 현재 로그인 여부:", isLoggedIn);
+    }, 3000);
     return () => clearInterval(id);
   }, [isLoggedIn]);
 
@@ -90,9 +75,11 @@ function AppContent() {
   );
 }
 
-// ————————————————————————————————————————————————
-// App: 최상위에 UserProvider로 Context를 감싸고 ToastContainer도 함께
-// ————————————————————————————————————————————————
+/**
+ * App 컴포넌트:
+ *  - 최상위에 UserProvider를 두어 Context를 전체 앱에 공급합니다.
+ *  - ToastContainer는 Context 밖이어도 무관합니다.
+ */
 function App() {
   return (
     <>
